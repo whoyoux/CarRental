@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write",
-    "prepare": "husky"
+    "format": "biome format --write"
   },
   "dependencies": {
     "@better-fetch/fetch": "^1.1.18",
