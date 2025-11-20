@@ -14,7 +14,7 @@ namespace CarRentalBackend.Services
 {
     public class AuthService(DataContext context, IConfiguration configuration) : IAuthService
     {
-        public async Task<TokenResponseDto?> LoginAsync(UserDto request)
+        public async Task<LoginResponseDto?> LoginAsync(UserDto request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
             if (user is null)
@@ -28,7 +28,16 @@ namespace CarRentalBackend.Services
                 return null;
             }
 
-            return await CreateTokenResponse(user);
+            var tokens = await CreateTokenResponse(user);
+
+            return new LoginResponseDto
+            {
+                AccessToken = tokens.AccessToken,
+                RefreshToken = tokens.RefreshToken,
+                Email = user.Email,
+                Role = user.Role,
+                Id = user.Id.ToString()
+            };
         }
 
         private async Task<TokenResponseDto> CreateTokenResponse(User user)

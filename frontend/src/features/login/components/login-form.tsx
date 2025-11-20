@@ -13,15 +13,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/providers/auth-provider";
 
 const loginSchema = z.object({
   email: z.string().min(2, "Email musi mieć co najmniej 2 znaki"),
   password: z.string().min(2, "Hasło musi mieć co najmniej 2 znaków"),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+export type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
+  const { login } = useAuth();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -30,8 +32,8 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = (values: LoginFormValues) => {
-    console.log(values);
+  const onSubmit = async (values: LoginFormValues) => {
+    await login(values);
   };
 
   return (

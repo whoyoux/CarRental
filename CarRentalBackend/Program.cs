@@ -1,19 +1,29 @@
 using CarRentalBackend.Data;
 using CarRentalBackend.Services;
+using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 
+DotEnv.Load();
+
 var builder = WebApplication.CreateBuilder(args);
+
+var envVars = DotEnv.Read();
+Console.WriteLine("Environment Variables Loaded:");
+foreach (var kvp in envVars)
+{
+    Console.WriteLine($"{kvp.Key}={kvp.Value}");
+}
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(envVars["DB_CONNECTION"]);
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -22,11 +32,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration.GetValue<string>("JwtConfig:Issuer"),
+            ValidIssuer = envVars["JWT_ISSUER"],
             ValidateAudience = true,
-            ValidAudience = builder.Configuration.GetValue<string>("JwtConfig:Audience"),
+            ValidAudience = envVars["JWT_AUDIENCE"],
             ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtConfig:Key")!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(envVars["JWT_KEY"])),
             ValidateIssuerSigningKey = true
         };
     });
@@ -37,7 +47,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(envVars["FRONTEND_URL"])
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
