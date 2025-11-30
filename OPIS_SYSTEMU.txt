@@ -1,0 +1,135 @@
+1. CEL I ZAKRES SYSTEMU
+
+System CarRental to aplikacja webowa służąca do zarządzania 
+wypożyczalnią samochodów. System umożliwia użytkownikom przeglądanie dostępnych 
+pojazdów, dokonywanie rezerwacji oraz wystawianie opinii, natomiast 
+administratorom zapewnia pełną kontrolę nad flotą samochodów, rezerwacjami 
+oraz dostęp do szczegółowych raportów finansowych i operacyjnych.
+
+2. UŻYTKOWNICY SYSTEMU
+
+System obsługuje dwie główne role użytkowników:
+
+- ZWYKŁY UŻYTKOWNIK (User):
+  * Przeglądanie dostępnych samochodów wraz ze szczegółowymi informacjami
+  * Tworzenie rezerwacji wybranych pojazdów na określony okres
+  * Przeglądanie historii swoich rezerwacji
+  * Anulowanie własnych rezerwacji
+  * Wystawianie i edycja recenzji wypożyczonych samochodów
+  * Przeglądanie opinii innych użytkowników
+
+- ADMINISTRATOR (Admin):
+  * Wszystkie funkcje dostępne dla zwykłego użytkownika
+  * Zarządzanie flotą samochodów (dodawanie, edycja, usuwanie)
+  * Przeglądanie wszystkich rezerwacji w systemie
+  * Anulowanie rezerwacji dowolnych użytkowników
+  * Generowanie raportów przychodów miesięcznych
+  * Przeglądanie historii rezerwacji poszczególnych użytkowników
+  * Sprawdzanie logów działań systemowych
+  * Obliczanie rabatów dla użytkowników na podstawie liczby rezerwacji
+
+3. GŁÓWNE FUNKCJONALNOŚCI
+
+3.1. Rejestracja i uwierzytelnianie
+System wykorzystuje mechanizm JWT (JSON Web Tokens) do bezpiecznego 
+uwierzytelniania użytkowników. Każdy użytkownik może zarejestrować konto 
+podając adres email i hasło. Po zalogowaniu otrzymuje token dostępu oraz 
+token odświeżania, które są automatycznie odnawiane.
+
+3.2. Zarządzanie samochodami
+System przechowuje informacje o każdym pojeździe: marka, model, rok produkcji, 
+cena za dzień, opis oraz zdjęcie. Administratorzy mogą dodawać nowe pojazdy, 
+modyfikować istniejące oraz usuwać je z systemu. Użytkownicy mogą przeglądać 
+dostępne samochody wraz z ich szczegółami i zarezerwowanymi terminami.
+
+3.3. System rezerwacji
+Użytkownicy mogą rezerwować samochody na wybrany okres. System automatycznie:
+- Sprawdza dostępność pojazdu w danym terminie
+- Oblicza całkowitą cenę na podstawie liczby dni i ceny za dzień
+- Zapisuje rezerwację w systemie
+- Loguje wszystkie operacje związane z rezerwacjami
+
+Użytkownicy mogą anulować swoje rezerwacje, a administratorzy mają możliwość 
+anulowania dowolnej rezerwacji w systemie. Każde usunięcie rezerwacji jest 
+automatycznie logowane przez trigger w bazie danych.
+
+3.4. System recenzji
+Użytkownicy mogą wystawić recenzję samochodu, 
+oceniając go w skali 1-5 oraz dodając komentarz. Recenzje można później 
+edytować lub usuwać. Wszyscy użytkownicy mogą przeglądać recenzje innych 
+użytkowników przy wyborze samochodu.
+
+3.5. Raportowanie i analityka
+System oferuje zaawansowane funkcje raportowania dostępne dla administratorów:
+- Raport przychodów miesięcznych z podziałem na miesiące i lata
+- Historia rezerwacji poszczególnych użytkowników
+- Automatyczne obliczanie rabatów (5% dla 5+ rezerwacji, 10% dla 10+)
+- Przeglądanie logów wszystkich działań systemowych
+
+4. ARCHITEKTURA TECHNICZNA
+
+Backend:
+- ASP.NET Core 10.0 (Web API)
+- Entity Framework Core (Code First)
+- SQL Server jako baza danych
+- JWT Bearer Authentication
+- Serilog do logowania
+
+Frontend:
+- Next.js 16 (React)
+- TypeScript
+- TanStack Query do zarządzania stanem
+- Shadcn/ui jako biblioteka komponentów
+
+Baza danych:
+- 5 głównych tabel: Users, Cars, Reservations, Reviews, ReservationLogs
+- Relacje 1:N między tabelami
+- 2 procedury składowane (raporty)
+- 1 funkcja użytkownika (obliczanie rabatu)
+- 1 trigger (logowanie usunięć rezerwacji)
+
+5. BEZPIECZEŃSTWO I WALIDACJA
+
+System implementuje wielowarstwowe zabezpieczenia:
+- Hasła są hashowane przy użyciu PasswordHasher
+- Endpointy wymagają autoryzacji
+- Endpointy administracyjne wymagają roli Admin
+- Walidacja danych wejściowych na poziomie DTO
+- Obsługa błędów przez dedykowany middleware
+- CORS skonfigurowany dla bezpiecznej komunikacji frontend-backend
+
+6. PROCES BIZNESOWY
+
+Typowy przepływ pracy w systemie:
+
+1. Użytkownik rejestruje się lub loguje do systemu
+2. Przegląda dostępne samochody na stronie głównej
+3. Wybiera interesujący go pojazd i sprawdza szczegóły oraz dostępność
+4. Tworzy rezerwację podając daty rozpoczęcia i zakończenia
+5. System weryfikuje dostępność i oblicza cenę
+6. Rezerwacja jest zapisywana w bazie danych
+7. Użytkownik może wystawić recenzję
+8. Administrator może monitorować wszystkie rezerwacje i generować raporty
+
+7. POTENCJALNI UŻYTKOWNICY APLIKACJI
+
+System może być wykorzystywany przez wypożyczalnie samochodów, firmy potrzebujące 
+pojazdów służbowych, agencje turystyczne oraz klientów indywidualnych poszukujących 
+wygodnego sposobu na wynajem samochodu.
+
+8. INSTRUKCJA URUCHOMIENIA PROJEKTU
+
+8.1. Przygotowanie środowiska
+W celu uruchomienia systemu należy wykonać następujące kroki:
+
+1. Sklonowanie lub rozpakowanie repozytorium projektu do lokalizacji docelowej
+2. Skonfigurowanie zmiennych środowiskowych poprzez skopiowanie pliku env.example do pliku .env w głównym katalogu projektu oraz dostosowanie wartości zgodnie z wymaganiami środowiska
+3. Uruchomienie kontenerów Docker poprzez wykonanie komendy docker-compose up -d w głównym katalogu projektu
+
+8.2. Dostęp do aplikacji
+Po pomyślnym uruchomieniu kontenerów, aplikacja frontendowa będzie dostępna pod adresem: http://localhost:3000
+
+8.3. Dane dostępowe administratora
+Domyślne dane logowania konta administratora (konfigurowalne w pliku .env):
+- Adres e-mail: admin@carrental.com
+- Hasło: adminadmin

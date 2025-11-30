@@ -1,0 +1,71 @@
+# Docker Compose automatically loads .env file from the same directory
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: carrental-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SQL_SERVER_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "${SQL_SERVER_PORT}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - carrental-network
+
+  backend:
+    build:
+      context: ./CarRentalBackend
+      dockerfile: Dockerfile
+      args:
+        - BUILD_CONFIGURATION=Release
+    container_name: carrental-backend
+    environment:
+      - DB_CONNECTION=Server=sqlserver,1433;Database=CarRentalDB;User Id=sa;Password=${SQL_SERVER_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - JWT_KEY=${JWT_KEY}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "${BACKEND_PORT}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_started
+    networks:
+      - carrental-network
+    volumes:
+      - ./CarRentalBackend/logs:/app/logs
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./CarRentalFrontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BACKEND_PATH=${FRONTEND_BACKEND_URL}
+    container_name: carrental-frontend
+    environment:
+      - NEXT_PUBLIC_BACKEND_PATH=${FRONTEND_BACKEND_URL}
+      - NODE_ENV=production
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend
+    networks:
+      - carrental-network
+    restart: unless-stopped
+
+networks:
+  carrental-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local
+
