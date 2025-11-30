@@ -49,12 +49,14 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_PATH=${FRONTEND_BACKEND_URL}
+        - FRONTEND_PORT=${FRONTEND_PORT}
     container_name: carrental-frontend
     environment:
       - NEXT_PUBLIC_BACKEND_PATH=${FRONTEND_BACKEND_URL}
       - NODE_ENV=production
+      - PORT=${FRONTEND_PORT}
     ports:
-      - "${FRONTEND_PORT}:3000"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     depends_on:
       - backend
     networks:
