@@ -49,7 +49,6 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_PATH=${FRONTEND_BACKEND_URL}
-        - FRONTEND_PORT=${FRONTEND_PORT}
     container_name: carrental-frontend
     environment:
       - NEXT_PUBLIC_BACKEND_PATH=${FRONTEND_BACKEND_URL}

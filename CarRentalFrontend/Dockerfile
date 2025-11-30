@@ -48,10 +48,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-ARG FRONTEND_PORT=3000
-ENV PORT=${FRONTEND_PORT}
-
-EXPOSE ${FRONTEND_PORT}
-
 ENV HOSTNAME="0.0.0.0"
+
+# PORT is set via environment variable from docker-compose
+# Port mapping is handled in docker-compose.yml, so EXPOSE is not needed
+
 CMD ["node", "server.js"]
