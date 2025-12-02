@@ -8,8 +8,6 @@ namespace CarRentalBackend.Models
         public required string Action { get; set; }
         public DateTime LogDate { get; set; } = DateTime.UtcNow;
 
-        public Reservation? Reservation { get; set; }
-        public User? User { get; set; }
     }
 }
 

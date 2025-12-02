@@ -118,10 +118,6 @@ namespace CarRentalBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReservationId");
-
-                    b.HasIndex("UserId");
-
                     b.ToTable("ReservationLogs", (string)null);
                 });
 
@@ -201,25 +197,6 @@ namespace CarRentalBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("Car");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("CarRentalBackend.Models.ReservationLog", b =>
-                {
-                    b.HasOne("CarRentalBackend.Models.Reservation", "Reservation")
-                        .WithMany()
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CarRentalBackend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reservation");
 
                     b.Navigation("User");
                 });

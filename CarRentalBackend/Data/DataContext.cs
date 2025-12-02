@@ -29,6 +29,7 @@ namespace CarRentalBackend.Data
             {
                 entity.ToTable("Reservations", t => t.HasTrigger("LogReservationDelete"));
             });
+
         }
     }
 }
